@@ -4,9 +4,22 @@ LibreOffice shipped in a Python package. No system installation, no first-use do
 
 ## Install
 
+lo4py is distributed exclusively through [GitHub Releases](https://github.com/JGalego/lo4py/releases/latest), not PyPI. Download the wheel matching your platform:
+
+| Platform | Wheel suffix |
+| --- | --- |
+| Linux x86-64 | `linux_x86_64.whl` |
+| Windows x86-64 | `win_amd64.whl` |
+| macOS Apple Silicon | `macosx_11_0_arm64.whl` |
+| macOS Intel | `macosx_11_0_x86_64.whl` |
+
+Install the downloaded file. For example, on Linux:
+
 ```sh
-pip install lo4py
+python -m pip install --no-index ./lo4py-26.8.3.0-py3-none-linux_x86_64.whl
 ```
+
+For a project managed by uv, use `uv add ./lo4py-26.8.3.0-py3-none-linux_x86_64.whl` instead.
 
 Binary wheels contain the full official LibreOffice distribution, not just a PDF converter. Downloads are large; budget roughly 1 GB of installed space.
 
@@ -63,7 +76,7 @@ process.wait()
 lo4py --version
 lo4py --headless --convert-to pdf --outdir output report.docx
 python -m lo4py --help
-uvx lo4py --version
+uvx --from ./lo4py-26.8.3.0-py3-none-linux_x86_64.whl lo4py --version
 ```
 
 All arguments are passed directly to LibreOffice; the exit status is preserved. Native CLI conversion has LibreOffice's own profile and overwrite behavior. Use the Python `convert` helper for isolated jobs and checked output.
@@ -71,7 +84,7 @@ All arguments are passed directly to LibreOffice; the exit status is preserved. 
 ## Platforms and limits
 
 - Python 3.10 or newer.
-- Linux x86-64: glibc 2.28+, an x86-64-v2 CPU, and distribution-provided native libraries. Wheels use `linux_x86_64`, not a misleading `manylinux` tag. These wheels can be installed from a file or private index, but cannot be uploaded to PyPI as-is.
+- Linux x86-64: glibc 2.28+, an x86-64-v2 CPU, and distribution-provided native libraries. Wheels use the native `linux_x86_64` tag; system libraries are not bundled.
 - Windows x86-64: Windows 10/11. `SOFFICE` uses the console launcher.
 - macOS x86-64 and arm64: macOS 11+.
 - No Linux arm64, musl/Alpine, or 32-bit wheels.
@@ -100,15 +113,27 @@ uv run mypy
 
 uv run python build_runtime.py
 uv run pytest -m integration
-uv run python -m build
+uv run python -m build --wheel
+uv run python -m build --sdist
 ```
 
 Wheel builds automatically stage the runtime if it is missing. Editable installs do not download it. Source distributions contain the wrapper and builder, not LibreOffice; building from an sdist needs network access and native extraction tools: `dpkg-deb` on Linux, `msiexec` on Windows, or `hdiutil` on macOS.
 
 Downloads are pinned by SHA-256 and cached in `.cache/lo4py`. `python build_runtime.py --cache PATH` selects another build-time cache. A corrupt cache or mismatched staged runtime is an error, not silently reused.
 
-The package version is `LibreOffice-major.minor.patch.wrapper-revision`. To update LibreOffice, change `src/lo4py/_version.py` (including the upstream build number), the four checksums in `build_runtime.py`, and the corresponding source URL in `NOTICE`. Native wheel jobs build each platform's wheel and smoke-test an installed copy. They upload workflow artifacts, not PyPI releases.
+## Release
 
-PyPI publication needs a large-file allowance for the bundled runtime. Portable Linux publication also needs a separately validated manylinux packaging policy; simply relabeling these wheels is not sufficient.
+The package version is `LibreOffice-major.minor.patch.wrapper-revision`. Start with the latest stable LibreOffice release; older lo4py releases remain available for pinning. There is no historical LibreOffice backfill.
+
+To update LibreOffice, change `src/lo4py/_version.py` (including the upstream build number), the four checksums in `build_runtime.py`, and the corresponding source URL in `NOTICE`. Update the versioned installation examples above.
+
+Push a tag matching the package version:
+
+```sh
+git tag v26.8.3.0
+git push origin v26.8.3.0
+```
+
+The wheel workflow builds and smoke-tests all four supported platforms, then publishes their wheels, the source distribution, and `SHA256SUMS` to a GitHub Release. Publication is gated on every platform passing. A manual workflow run on a branch builds artifacts without publishing. Nothing is uploaded to PyPI.
 
 The wrapper is MIT-licensed. LibreOffice and its bundled components retain their own licenses and notices; see [NOTICE](NOTICE). This project is independent of The Document Foundation.
