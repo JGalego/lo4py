@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lo4py"
+dynamic = ["version"]
+description = "LibreOffice shipped in a Python package"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
+dependencies = []
+keywords = ["libreoffice", "office", "pdf", "document", "conversion"]
+classifiers = [
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Typing :: Typed",
+]
+
+[project.scripts]
+lo4py = "lo4py.__main__:main"
+
+[dependency-groups]
+dev = ["build>=1.2", "mypy>=1.15", "pytest>=8", "ruff>=0.9"]
+
+[tool.setuptools.dynamic]
+version = {attr = "lo4py._version.__version__"}
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["lo4py"]
+namespaces = false
+
+[tool.setuptools.package-data]
+lo4py = ["py.typed", "runtime/**/*", "runtime/.lo4py-version"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+filterwarnings = ["error"]
+markers = ["integration: requires the bundled LibreOffice runtime"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+extend-exclude = ["src/lo4py/runtime", "src/lo4py/lo4py-build-*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src/lo4py", "build_runtime.py"]
+exclude = '(^|/)(runtime|lo4py-build-[^/]+)(/|$)'

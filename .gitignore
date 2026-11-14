@@ -1,0 +1,13 @@
+.venv/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+*.egg-info/
+build/
+dist/
+wheelhouse/
+src/lo4py/runtime/
+src/lo4py/lo4py-build-*/
+.wheel-test/

@@ -1,0 +1,63 @@
+name: Wheels
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux-x86_64
+          - os: windows-2022
+            platform: windows-x86_64
+          - os: macos-15
+            platform: macos-arm64
+          - os: macos-15-intel
+            platform: macos-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.14"
+          enable-cache: true
+      - uses: actions/cache@v4
+        with:
+          path: .cache/lo4py
+          key: libreoffice-${{ matrix.platform }}-${{ hashFiles('build_runtime.py', 'src/lo4py/_version.py') }}
+      - run: uv sync --locked --group dev
+      - run: uv run python -m build
+      - name: Collect native wheels
+        shell: bash
+        run: |
+          mkdir -p wheelhouse
+          cp dist/*.whl wheelhouse/
+      - name: Smoke-test the installed wheel, not the source tree
+        shell: bash
+        run: |
+          uv venv .wheel-test --python 3.14
+          uv pip install --python .wheel-test --no-index --find-links wheelhouse lo4py
+          uv pip install --python .wheel-test pytest
+          if [ "$RUNNER_OS" = Windows ]; then
+            python="$PWD/.wheel-test/Scripts/python.exe"
+          else
+            python="$PWD/.wheel-test/bin/python"
+          fi
+          cd "$RUNNER_TEMP"
+          "$python" -c 'from lo4py import SOFFICE; assert SOFFICE.is_file(), SOFFICE'
+          "$python" -m pytest "$GITHUB_WORKSPACE/tests/test_integration.py" \
+            -c "$GITHUB_WORKSPACE/pyproject.toml" -o pythonpath= \
+            --rootdir="$RUNNER_TEMP"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lo4py-${{ matrix.platform }}
+          path: wheelhouse/*.whl
+          compression-level: 0

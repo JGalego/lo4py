@@ -1,0 +1,15 @@
+The lo4py Python wrapper and build tooling are licensed under the MIT license.
+
+Binary wheels also contain official LibreOffice distributions from
+The Document Foundation. LibreOffice and its bundled components have their
+own licenses, including MPL-2.0 and LGPL-3.0-or-later. The upstream license
+notices and credits are retained inside lo4py/runtime; the wrapper's MIT
+license does not replace them.
+
+Corresponding LibreOffice source:
+https://download.documentfoundation.org/libreoffice/src/26.8.3/
+https://www.libreoffice.org/about-us/licenses/
+
+LibreOffice is a registered trademark of The Document Foundation.
+lo4py is an independent project, not affiliated with or endorsed by
+The Document Foundation.

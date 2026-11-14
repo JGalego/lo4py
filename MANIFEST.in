@@ -1,0 +1,4 @@
+include build_runtime.py
+include README.md LICENSE NOTICE
+recursive-include tests *.py
+prune src/lo4py/runtime
