@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="Document and code emblem" width="128">
+  <img src="assets/logo.svg" alt="Office document emblem" width="128">
 </p>
 
 <h1 align="center">lo4py</h1>

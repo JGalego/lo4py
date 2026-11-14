@@ -1,18 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" role="img" aria-labelledby="title description">
-  <title id="title">Document and code emblem</title>
-  <desc id="description">A folded document with code chevrons on an emerald and sky-blue tile.</desc>
-  <defs>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#34d399"/>
-      <stop offset="1" stop-color="#38bdf8"/>
-    </linearGradient>
-  </defs>
-  <rect width="160" height="160" rx="32" fill="#0f172a"/>
-  <rect x="24" y="24" width="112" height="112" rx="22" fill="url(#accent)"/>
-  <path d="M56 42h34l22 22v54H56z" fill="#f8fafc"/>
-  <path d="M90 42v22h22" fill="#bae6fd"/>
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4.5">
-    <path d="m73 81-8 9 8 9m23-18 8 9-8 9" stroke="#0f172a"/>
-    <path d="m89 78-8 24" stroke="#059669"/>
-  </g>
+  <title id="title">Office document emblem</title>
+  <desc id="description">A green folded page containing document lines and spreadsheet cells.</desc>
+  <path d="M34 14h64l28 28v104H34z" fill="#ffffff" stroke="#18a303" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M98 14v28h28z" fill="#dcfce7" stroke="#18a303" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M50 66h60M50 78h38" fill="none" stroke="#18a303" stroke-width="5" stroke-linecap="round"/>
+  <path d="M50 94h60v11H50z" fill="#dcfce7"/>
+  <path d="M50 94h60v34H50zM50 105h60M50 117h60M70 94v34M90 94v34" fill="none" stroke="#18a303" stroke-width="2.5"/>
 </svg>
