@@ -1,4 +1,17 @@
-# lo4py
+<p align="center">
+  <img src="assets/logo.svg" alt="Document and code emblem" width="128">
+</p>
+
+<h1 align="center">lo4py</h1>
+
+<p align="center"><strong>LibreOffice power. Python simplicity.</strong></p>
+
+<p align="center">
+  <a href="https://github.com/JGalego/lo4py/releases/latest"><img src="https://img.shields.io/github/v/release/JGalego/lo4py?style=flat-square&amp;color=16a34a" alt="Latest release"></a>
+  <a href="https://github.com/JGalego/lo4py/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/JGalego/lo4py/test.yml?branch=main&amp;style=flat-square&amp;label=tests" alt="Tests"></a>
+  <a href="https://github.com/JGalego/lo4py/blob/main/pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.10 or newer"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/wrapper-MIT-64748b?style=flat-square" alt="Wrapper license: MIT"></a>
+</p>
 
 LibreOffice shipped in a Python package. No system installation, no first-use download, no Python runtime dependencies.
 
