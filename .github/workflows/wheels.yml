@@ -72,7 +72,10 @@ jobs:
           fi
           cd "$RUNNER_TEMP"
           "$python" -c 'from lo4py import SOFFICE; assert SOFFICE.is_file(), SOFFICE'
-          "$python" -m pytest "$GITHUB_WORKSPACE/tests/test_integration.py" \
+          "$python" -c 'from lo4py import python_executable; print(python_executable())'
+          "$python" -m pytest \
+            "$GITHUB_WORKSPACE/tests/test_integration.py" \
+            "$GITHUB_WORKSPACE/tests/test_office.py" \
             -c "$GITHUB_WORKSPACE/pyproject.toml" -o pythonpath= \
             --rootdir="$RUNNER_TEMP" --showlocals
       - uses: actions/upload-artifact@v4

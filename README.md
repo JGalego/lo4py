@@ -29,10 +29,10 @@ lo4py is distributed exclusively through [GitHub Releases](https://github.com/JG
 Install the downloaded file. For example, on Linux:
 
 ```sh
-python -m pip install --no-index ./lo4py-26.8.3.0-py3-none-linux_x86_64.whl
+python -m pip install --no-index ./lo4py-26.8.3.1-py3-none-linux_x86_64.whl
 ```
 
-For a project managed by uv, use `uv add ./lo4py-26.8.3.0-py3-none-linux_x86_64.whl` instead.
+For a project managed by uv, use `uv add ./lo4py-26.8.3.1-py3-none-linux_x86_64.whl` instead.
 
 Binary wheels contain the full official LibreOffice distribution, not just a PDF converter. Downloads are large; budget roughly 1 GB of installed space.
 
@@ -60,6 +60,22 @@ pdf = convert(
 ```
 
 Failures raise `FileNotFoundError`, `FileExistsError`, `ValueError`, `subprocess.CalledProcessError`, or `subprocess.TimeoutExpired`. LibreOffice sometimes reports conversion errors with exit code zero: `ConversionError` detects missing output and includes its diagnostics.
+
+### Read and recalculate
+
+```python
+from lo4py import extract, recalculate
+
+content = extract("model.xlsx")
+print(content.sheets["Sheet1"])  # computed values, even if the file stored none
+print(extract("report.docx").text)
+
+recalculate("model.xlsx", "model-calculated.xlsx")
+```
+
+`extract(source, *, recalculate=True, timeout=120)` returns `Extracted(kind, text, sheets)`. `kind` is `"text"`, `"spreadsheet"`, `"presentation"` or `"drawing"`; `sheets` maps sheet names to rows of values for spreadsheets. `recalculate(source, output, *, overwrite=False, timeout=120)` recalculates every formula and saves an `.xlsx`, `.xls` or `.ods` copy with the results stored, which is useful for files written by libraries that cannot evaluate formulas. The source is never modified and existing outputs are refused unless `overwrite=True`.
+
+Documents open read-only (recalculate excepted) with macros and link updates disabled. Each call starts an isolated LibreOffice that is stopped afterwards. The UNO work happens in LibreOffice's bundled Python, so nothing is imported into your interpreter. `python_executable()` returns that interpreter if you want to run your own UNO scripts. Failures raise `OfficeError`.
 
 ### Native LibreOffice
 
@@ -89,7 +105,7 @@ process.wait()
 lo4py --version
 lo4py --headless --convert-to pdf --outdir output report.docx
 python -m lo4py --help
-uvx --from ./lo4py-26.8.3.0-py3-none-linux_x86_64.whl lo4py --version
+uvx --from ./lo4py-26.8.3.1-py3-none-linux_x86_64.whl lo4py --version
 ```
 
 All arguments are passed directly to LibreOffice; the exit status is preserved. Native CLI conversion has LibreOffice's own profile and overwrite behavior. Use the Python `convert` helper for isolated jobs and checked output.
@@ -102,7 +118,7 @@ All arguments are passed directly to LibreOffice; the exit status is preserved. 
 - macOS x86-64 and arm64: macOS 11+.
 - No Linux arm64, musl/Alpine, or 32-bit wheels.
 
-Fonts affect layout and are not supplied by lo4py. GUI features need a desktop. Some Base features need Java, which is not bundled. UNO is accessible through LibreOffice's native interfaces, but lo4py does not install Python UNO bindings for the host interpreter. Treat untrusted documents as untrusted code; run conversion in your own restricted worker/container.
+Fonts affect layout and are not supplied by lo4py. GUI features need a desktop. Some Base features need Java, which is not bundled. UNO bindings are compiled for LibreOffice's bundled Python, not for yours: `import uno` will not work in your own interpreter, but `extract` and `recalculate` use the bundled one for you. Treat untrusted documents as untrusted code; run conversion in your own restricted worker/container.
 
 LibreOffice inherits the process environment. Java discovery can make startup slow if `PATH` contains network drives or Windows mount paths under WSL; remove those entries in your worker environment if necessary.
 
@@ -143,8 +159,8 @@ To update LibreOffice, change `src/lo4py/_version.py` (including the upstream bu
 Push a tag matching the package version:
 
 ```sh
-git tag v26.8.3.0
-git push origin v26.8.3.0
+git tag v26.8.3.1
+git push origin v26.8.3.1
 ```
 
 The wheel workflow builds and smoke-tests all four supported platforms, then publishes their wheels, the source distribution, and `SHA256SUMS` to a GitHub Release. Publication is gated on every platform passing. A manual workflow run on a branch builds artifacts without publishing. Nothing is uploaded to PyPI.
