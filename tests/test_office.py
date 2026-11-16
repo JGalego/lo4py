@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import time
 from pathlib import Path
 
 import pytest
@@ -92,3 +93,27 @@ def test_missing_source_is_reported(tmp_path: Path) -> None:
         extract(tmp_path / "missing.xlsx")
     with pytest.raises(ValueError, match="must end in"):
         recalculate(tmp_path / "x.fods", tmp_path / "out.txt")
+
+
+def office_processes() -> list[str]:
+    found = []
+    for entry in Path("/proc").glob("[0-9]*/cmdline"):
+        try:
+            arguments = entry.read_bytes().split(b"\0")
+        except OSError:
+            continue
+        if any(item.startswith(b"--accept=pipe,name=lo4py-") for item in arguments):
+            found.append(entry.parent.name)
+    return found
+
+
+@pytest.mark.skipif(not Path("/proc/self").exists(), reason="needs /proc")
+def test_timeout_reports_error_and_leaves_no_process(tmp_path: Path) -> None:
+    source = tmp_path / "data.fods"
+    source.write_text(SHEET, encoding="utf-8")
+    started = time.monotonic()
+    with pytest.raises(OfficeError):
+        extract(source, timeout=0.05)
+    assert time.monotonic() - started < 8
+    time.sleep(0.5)
+    assert office_processes() == []

@@ -69,7 +69,8 @@ def connect(
         try:
             return resolver.resolve(url)
         except Exception:
-            if process.poll() is not None:
+            # A launcher may exit cleanly after handing off to the real process.
+            if process.poll() not in (None, 0):
                 raise RuntimeError(
                     f"LibreOffice exited with status {process.returncode} "
                     "before accepting a connection"
@@ -225,8 +226,9 @@ def main() -> int:
         fail(f"{type(error).__name__}: {error}" + (f"\n{detail}" if detail else ""))
     finally:
         watchdog.cancel()
-        with contextlib.suppress(subprocess.TimeoutExpired):
-            process.wait(timeout=10)
+        if code == 0:
+            with contextlib.suppress(subprocess.TimeoutExpired):
+                process.wait(timeout=10)
         kill_tree(process)
     sys.stdout.flush()
     return code
